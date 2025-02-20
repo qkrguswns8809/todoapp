@@ -13,6 +13,7 @@ export default function MyPageScreen(){
        const navigation = useNavigation();
        const Stack = createNativeStackNavigator();
     return (
+        
 
         <View style={{ flex: 1, alignItems: 'center', justifyContent: 'flex-start', paddingTop: 20 }}>
             <Pressable>
