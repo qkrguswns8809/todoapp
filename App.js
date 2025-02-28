@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import Entypo from '@expo/vector-icons/Entypo';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 
 // 페이지 import
 import TodoListScreen from './screens/TodoListScreen';
@@ -18,103 +19,43 @@ import SignUpScreen from './components/SignUpScreen';
 import BoardScreen from './writescreens/BoardScreen';
 import WriteScreen from './writescreens/WriteScreen';
 import PostDetailScreen from './writescreens/PostDetailScreen';
+import map from './screens/map';
+import WeatherScreen from './screens/WeatherScreen'; // Weather.js 추가
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
-const App = () => {
-  const [posts, setPosts] = useState([]);
-  const [todoItems, setTodoItems] = useState([]); // 새로운 상태 추가
-
+// 홈 네비게이션 (게임 화면 포함)
+const HomeStackScreen = () => {
   return (
-    <NavigationContainer>
-      <Tab.Navigator>
-        <Tab.Screen
-          name="활동일지"
-          options={{
-            title: '활동일지',
-            headerTitleAlign: 'center',
-            tabBarIcon: ({ focused }) => (
-              <Entypo name="open-book" size={24} color="black" />
-            ),
-          }}
-        >
-          {() => <TodoStackScreen todoItems={todoItems} setTodoItems={setTodoItems} />}
-        </Tab.Screen>
-
-        <Tab.Screen
-          name="게시판"
-          options={{
-            title: '게시판',
-            headerTitleAlign: 'center',
-            tabBarIcon: ({ focused }) => (
-              <FontAwesome6 name="clipboard-list" size={24} color="black" />
-            ),
-          }}
-        >
-          {props => <BoardStackScreen {...props} posts={posts} setPosts={setPosts} />}
-        </Tab.Screen>
-
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{
-            title: '메인 홈',
-            headerTitleAlign: 'center',
-            tabBarIcon: ({ focused }) => (
-              <AntDesign name="home" size={24} color="black" />
-            ),
-          }}
-        />
-        
-        <Tab.Screen
-          name="게임"
-          component={GameScreen}
-          options={{
-            title: "게임",
-            headerTitleAlign: "center",
-            tabBarIcon: ({ focused }) => (
-              <FontAwesome6 name="gamepad" size={24} color="black" />
-            ),
-          }}
-        />
-        
-        <Tab.Screen
-          name="내정보"
-          component={MyPageScreen}
-          options={{
-            title: '마이 페이지',
-            headerTitleAlign: 'center',
-            tabBarIcon: ({ focused }) => (
-              <FontAwesome6 name="circle-user" size={24} color="black" />
-            ),
-          }}
-        />
-      </Tab.Navigator>
-    </NavigationContainer>
+    <Stack.Navigator>
+      <Stack.Screen name="Home" component={HomeScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Game" component={GameScreen} options={{ title: "게임 화면" }} />
+      <Stack.Screen name="Weather" component={WeatherScreen} options={{ title: "날씨 화면" }} />
+  
+    </Stack.Navigator>
   );
 };
 
 // 활동일지 네비게이션
-function TodoStackScreen({ todoItems, setTodoItems }) {
+function TodoStackScreen() {
   return (
     <Stack.Navigator>
-      <Stack.Screen
-        name="활동일지"
-        options={{ headerShown: false }}
-      >
-        {() => <TodoListScreen todoItems={todoItems} setTodoItems={setTodoItems} />}
-      </Stack.Screen>
-      <Stack.Screen
-        name="활동일지쓰기"
-        component={TodoWriteScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="집사정보"
-        component={ButlerScreen}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="활동일지" component={TodoListScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="활동일지쓰기" component={TodoWriteScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="집사정보" component={ButlerScreen} options={{ headerShown: false }} />
+    </Stack.Navigator>
+  );
+}
+
+// 마이페이지 네비게이션
+function MyPageStackScreen() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen name="마이페이지" component={MyPageScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="집사정보" component={ButlerScreen} options={{ headerShown: false }} />
+      <Stack.Screen name="Login" component={LoginScreen} />
+      <Stack.Screen name="SignUp" component={SignUpScreen} />
     </Stack.Navigator>
   );
 }
@@ -132,31 +73,83 @@ function BoardStackScreen({ posts, setPosts }) {
       <Stack.Screen name="게시글 상세">
         {props => <PostDetailScreen {...props} posts={posts} setPosts={setPosts} />}
       </Stack.Screen>
-
+      <Stack.Screen name="게시글 수정">
+        {props => <PostDetailScreen {...props} posts={posts} setPosts={setPosts} />}
+      </Stack.Screen>
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="SignUp" component={SignUpScreen} />
     </Stack.Navigator>
   );
 }
 
-// 마이페이지 네비게이션
-function MyPageStackScreen() {
+const App = () => {
+  const [posts, setPosts] = useState([]);
+
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="마이페이지"
-        component={MyPageScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="집사정보"
-        component={ButlerScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen name="Login" component={LoginScreen} />
-      <Stack.Screen name="SignUp" component={SignUpScreen} />
-    </Stack.Navigator>
+    <NavigationContainer>
+      <Tab.Navigator>
+        <Tab.Screen
+          name="활동일지"
+          component={TodoStackScreen}
+          options={{
+            title: '활동일지',
+            headerTitleAlign: 'center',
+            tabBarIcon: ({ focused }) => (
+              <Entypo name="open-book" size={24} color="black" />
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="게시판"
+          component={() => <BoardStackScreen posts={posts} setPosts={setPosts} />}
+          options={{
+            title: '게시판',
+            headerTitleAlign: 'center',
+            tabBarIcon: ({ focused }) => (
+              <FontAwesome6 name="clipboard-list" size={24} color="black" />
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="HomeStack"
+          component={HomeStackScreen}
+          options={{
+            title: '메인 홈',
+            headerTitleAlign: 'center',
+            tabBarIcon: ({ focused }) => (
+              <AntDesign name="home" size={24} color="black" />
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="map"
+          component={map}
+          options={{
+            title: '동물병원',
+            headerTitleAlign: 'center',
+            tabBarIcon: ({ focused }) => (
+              <FontAwesome5 name="hospital" size={24} color="black" />
+            ),
+          }}
+        />
+
+        <Tab.Screen
+          name="내정보"
+          component={MyPageStackScreen}
+          options={{
+            title: '마이 페이지',
+            headerTitleAlign: 'center',
+            tabBarIcon: ({ focused }) => (
+              <FontAwesome6 name="circle-user" size={24} color="black" />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
 export default App;
